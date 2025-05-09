@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import Card from "./components/Card";
 import shuffle, { type cardType } from "./utilities/shuffle";
+import Header from "./components/Header";
 
 function App() {
   const [cards, setCards] = useState(shuffle); // Cards array from assets
@@ -10,13 +11,21 @@ function App() {
   const [wins, setWins] = useState(0); // Win streak
 
   const handleClick = (card: cardType) => {
-    if (!disabled) pickOne ? setPickTwo(card) : setPickOne(card);
+    if (!disabled && card !== pickOne && !card.matched)
+      pickOne ? setPickTwo(card) : setPickOne(card);
   };
 
   const handleTurn = () => {
     setPickOne(null);
     setPickTwo(null);
     setDisabled(false);
+  };
+
+  // Start over
+  const handleNewGame = () => {
+    setWins(0);
+    handleTurn();
+    setCards(shuffle);
   };
 
   useEffect(() => {
@@ -57,6 +66,7 @@ function App() {
 
   return (
     <>
+      <Header handleNewGame={handleNewGame} wins={wins} />
       <div className="grid">
         {cards.map((card) => {
           const { image, id, matched } = card;
